@@ -26,8 +26,6 @@ import androidx.viewpager.widget.ViewPager;
 //    }
 
 
-
-
     public class Home extends AppCompatActivity {
 
         @Override
