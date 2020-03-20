@@ -1,6 +1,4 @@
 package com.example.progandroid;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import android.content.ContentValues;
 import android.content.Context;
@@ -33,7 +31,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        // TODO Auto-generated method stub
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS contacts");
         onCreate(sqLiteDatabase);
     }

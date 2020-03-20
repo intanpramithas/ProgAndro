@@ -1,16 +1,26 @@
 package com.example.progandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import com.google.android.material.snackbar.Snackbar;
 
 
@@ -19,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     //Declaration EditTexts
     EditText editTextEmail;
     EditText editTextPassword;
+
+    private boolean isRecieverReigtered = false;
 
     //Declaration TextInputLayout
 //    TextInputLayout textInputLayoutEmail;
@@ -29,8 +41,9 @@ public class MainActivity extends AppCompatActivity {
     //Declaration SqliteHelper
     DBHelper sqliteHelper;
     SharedPreferences sharedpreferences;
-    public static final String MyPREFERENCES = "MyPrefs" ;
+    public static final String MyPREFERENCES = "MyPrefs";
     public static final String Email = "emailKey";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,11 +51,11 @@ public class MainActivity extends AppCompatActivity {
         sqliteHelper = new DBHelper(this);
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
-        System.out.println("available Login Email : "+ sharedpreferences.getString(Email,new String()));
-        if(sharedpreferences.getString(Email,new String())!=""){
+        System.out.println("available Login Email : " + sharedpreferences.getString(Email, new String()));
+        if (sharedpreferences.getString(Email, new String()) != "") {
             Intent i = new Intent(MainActivity.this, Home.class);
             Bundle b = new Bundle();
-            b.putString("Email", sharedpreferences.getString(Email,new String()));
+            b.putString("Email", sharedpreferences.getString(Email, new String()));
             i.putExtras(b);
             startActivity(i);
         }
@@ -62,14 +75,14 @@ public class MainActivity extends AppCompatActivity {
                     String Password = editTextPassword.getText().toString();
 
                     //Authenticate user
-                    User currentUser = sqliteHelper.Authenticate(new User(null,Email, Password));
+                    User currentUser = sqliteHelper.Authenticate(new User(null, Email, Password));
 
                     //Check Authentication is successful or not
                     if (currentUser != null) {
                         Snackbar.make(buttonLogin, "Successfully Logged in!", Snackbar.LENGTH_LONG).show();
 
                         //User Logged in Successfully Launch You home screen activity
-                        Intent intent=new Intent(MainActivity.this,Home.class);
+                        Intent intent = new Intent(MainActivity.this, Home.class);
                         startActivity(intent);
                         finish();
                     } else {
@@ -149,4 +162,57 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-}
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!isNetworkAvailable(context)) {
+                Toast.makeText(context, "ON", Toast.LENGTH_SHORT).show();
+                Notification(context, "Wifi connection is on!");
+            } else if (isNetworkAvailable(context)) {
+                Toast.makeText(context, "OFF", Toast.LENGTH_SHORT).show();
+                Notification(context, "Wifi connection is off!");
+            }
+        }
+    }
+
+    public void Notification(Context context, String messages) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.ic_launcher_symbol)
+                .setTicker(messages)
+                .setContentTitle("Tugas Wifi Notification")
+                .setContentText(messages)
+                .setAutoCancel(true);
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(0, builder.build());
+
+    }
+
+    private boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
+    }
+
+
+    protected void onResume() {
+        super.onResume();
+        if (!isRecieverReigtered) {
+            isRecieverReigtered = true;
+            registerReceiver(receiver, new IntentFilter("android.net.wifi.STATE_CHANGE"));
+        }
+    }
+
+    protected void onPause() {
+        super.onPause();
+        if (isRecieverReigtered) {
+
+
+        }
+
+
+    }
+
+};
+
+
