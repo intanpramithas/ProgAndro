@@ -180,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void Notification(Context context, String messages) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.home)
                 .setTicker(messages)
                 .setContentTitle("Tugas Wifi Notification")
                 .setContentText(messages)

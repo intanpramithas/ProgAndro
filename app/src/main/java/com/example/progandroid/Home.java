@@ -50,7 +50,7 @@ import java.util.TimerTask;
         private static final String TAG = "MainActivity";
         public static final long INTERVAL=3000;//variable to execute services every 10 second
         private Handler mHandler = new Handler();
-        private Timer mTimer = null;
+
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,6 @@ import java.util.TimerTask;
 
         public void Notification(Context context, String messages){
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.home)
                     .setTicker(messages)
                     .setContentTitle("Tugas Wifi Notification")
                     .setContentText(messages)
@@ -107,49 +106,49 @@ import java.util.TimerTask;
             }
         }
 
-        public void scheduleJob(View view){
-            ComponentName componentName = new ComponentName(this, MyJobService.class);
-            JobInfo info = new JobInfo.Builder(123, componentName)
-                    .setPersisted(true)
-                    .setPeriodic(15 * 60 * 1000)
-                    .build();
-
-            JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-            int resultCode = scheduler.schedule(info);
-            if(resultCode == JobScheduler.RESULT_SUCCESS){
-                Log.d(TAG, "Job scheduled");
-            } else {
-                Log.d(TAG, "Job scheduling failed");
-            }
-
-            if (mTimer!=null)
-                mTimer.cancel();
-            else
-                mTimer = new Timer();
-
-            mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(),0,INTERVAL);
-
-            }
-
-
-            public void cancelJob(View view){
-            JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-            scheduler.cancel(123);
-            Log.d(TAG, "Job canceled");
-            mTimer.cancel();
-            }
-
-            private class TimeDisplayTimerTask extends TimerTask{
-            @Override
-            public void run(){
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), "3detik", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-            }
+//        public void scheduleJob(View view){
+//            ComponentName componentName = new ComponentName(this, MyJobService.class);
+//            JobInfo info = new JobInfo.Builder(123, componentName)
+//                    .setPersisted(true)
+//                    .setPeriodic(15 * 60 * 1000)
+//                    .build();
+//
+//            JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+//            int resultCode = scheduler.schedule(info);
+//            if(resultCode == JobScheduler.RESULT_SUCCESS){
+//                Log.d(TAG, "Job scheduled");
+//            } else {
+//                Log.d(TAG, "Job scheduling failed");
+//            }
+//
+//            if (mTimer!=null)
+//                mTimer.cancel();
+//            else
+//                mTimer = new Timer();
+//
+//            mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(),0,INTERVAL);
+//
+//            }
+//
+//
+//            public void cancelJob(View view){
+//            JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+//            scheduler.cancel(123);
+//            Log.d(TAG, "Job canceled");
+//            mTimer.cancel();
+//            }
+//
+//            class TimeDisplayTimerTask extends TimerTask{
+//            @Override
+//            public void run(){
+//                mHandler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Toast.makeText(getApplicationContext(), "3detik", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//            }
+//            }
 
         }
 
