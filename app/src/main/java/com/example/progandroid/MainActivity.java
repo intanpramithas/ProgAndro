@@ -20,6 +20,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.content.ComponentName;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -173,11 +176,11 @@ public class MainActivity extends AppCompatActivity {
                 Notification(context, "Wifi connection is off!");
             }
         }
-    }
+    };
 
     public void Notification(Context context, String messages) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_launcher_symbol)
+                .setSmallIcon(R.drawable.home)
                 .setTicker(messages)
                 .setContentTitle("Tugas Wifi Notification")
                 .setContentText(messages)
