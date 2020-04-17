@@ -1,20 +1,33 @@
 package com.example.progandroid;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
-public class Home extends AppCompatActivity {
+public class About extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_about);
 //        Toolbar toolbar = findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 //
@@ -27,18 +40,8 @@ public class Home extends AppCompatActivity {
 //            }
 //        });
     }
-    public void cobafragment(View view){
-        Intent intent = new Intent(Home.this, Coba_Fragment.class);
-        startActivity((intent));
-    }
-    public void about(View view){
-        Intent intent = new Intent(Home.this, About.class);
-        startActivity(intent);
-    }
-    public void logout(View view){
-        Intent i = new Intent(Home.this, MainActivity.class);
+    public void Kembali(View view){
+        Intent i = new Intent(About.this, Home.class);
         startActivity(i);
     }
-
-
 }

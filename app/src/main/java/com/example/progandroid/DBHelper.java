@@ -1,152 +1,91 @@
 package com.example.progandroid;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
-
 
 public class DBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "MyDBName.db";
-    public static final String CONTACTS_TABLE_NAME = "contacts";
-    public static final String CONTACTS_COLUMN_EMAIL = "email";
+    public static final String CONTACTS_TABLE_NAME = "mahasiswa";
+    public static final String CONTACTS_COLUMN_NIM= "nim";
+    public static final String CONTACTS_COLUMN_NAMA = "nama";
     public static final String CONTACTS_COLUMN_NOHP = "nohp";
-    public static final String CONTACTS_COLUMN_PASSWORD = "password";
     private HashMap hp;
-
-    public static final String TABLE_USERS = " CREATE TABLE " + CONTACTS_TABLE_NAME + "(" + CONTACTS_COLUMN_EMAIL + " TEXT NOT NULL PRIMARY KEY, " + CONTACTS_COLUMN_NOHP + " TEXT NOT NULL, "+ CONTACTS_COLUMN_PASSWORD + " TEXT NOT NULL)";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME , null, 1);
     }
 
     @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        //Create Table when oncreate gets called
-        sqLiteDatabase.execSQL(TABLE_USERS);
+    public void onCreate(SQLiteDatabase db) {
+        // TODO Auto-generated method stub
+        final String SQL = "CREATE TABLE "+ CONTACTS_TABLE_NAME+"("+
+                CONTACTS_COLUMN_NIM+" TEXT NOT NULL PRIMARY KEY, "+CONTACTS_COLUMN_NAMA+" TEXT NOT NULL, "+CONTACTS_COLUMN_NOHP+" TEXT NOT NULL)";
+        db.execSQL(SQL);
     }
-
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS contacts");
-        onCreate(sqLiteDatabase);
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // TODO Auto-generated method stub
+        db.execSQL("DROP TABLE IF EXISTS mahasiswa");
+        onCreate(db);
     }
 
-    public void addUser(User user) {
-
-        //get writable database
+    public boolean insertContact (String nim,String nama, String nohp) {
         SQLiteDatabase db = this.getWritableDatabase();
-
-        //create content values to insert
-        ContentValues values = new ContentValues();
-
-        //Put username in  @values
-        values.put(CONTACTS_COLUMN_NOHP, user.nohp);
-
-        //Put email in  @values
-        values.put(CONTACTS_COLUMN_EMAIL, user.email);
-
-        //Put password in  @values
-        values.put(CONTACTS_COLUMN_PASSWORD, user.password);
-
-        // insert row
-        long todo_id = db.insert(CONTACTS_TABLE_NAME, null, values);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("nim", nim);
+        contentValues.put("name", nama);
+        contentValues.put("phone", nohp);
+        db.insert("mahasiswa", null, contentValues);
+        return true;
     }
 
-    public User Authenticate(User user) {
-        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.query(CONTACTS_TABLE_NAME,// Selecting Table
-                new String[]{CONTACTS_COLUMN_NOHP, CONTACTS_COLUMN_EMAIL, CONTACTS_COLUMN_PASSWORD},//Selecting columns want to query
-                CONTACTS_COLUMN_EMAIL + "=?",
-                new String[]{user.email},//Where clause
-                null, null, null);
+    public Cursor getData(int nim) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from mahasiswa where nim="+nim+"", null );
+        return res;
+    }
 
-        if (cursor != null && cursor.moveToFirst()&& cursor.getCount()>0) {
-            //if cursor has value then in user database there is user associated with this given email
-            User user1 = new User(null, cursor.getString(1), cursor.getString(2));
+    public int numberOfRows(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        int numRows = (int) DatabaseUtils.queryNumEntries(db, CONTACTS_TABLE_NAME);
+        return numRows;
+    }
 
-            //Match both passwords check they are same or not
-            if (user.password.equalsIgnoreCase(user1.password)) {
-                return user1;
-            }
+    public boolean updateContact (String nim, String nama, String nohp) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("name", nama);
+        contentValues.put("phone", nohp);
+        db.update("mahasiswa", contentValues, "nim = ? ", new String[] { nim } );
+        return true;
+    }
+
+    public Integer deleteContact (String nim) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete("mahasiswa",
+                "nim = ? ",
+                new String[] { nim });
+    }
+
+    public ArrayList<String> getAllCotacts() {
+        ArrayList<String> array_list = new ArrayList<String>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from mahasiswa", null );
+        res.moveToFirst();
+
+        while(res.isAfterLast() == false){
+            array_list.add(res.getString(res.getColumnIndex(CONTACTS_COLUMN_NAMA)));
+            res.moveToNext();
         }
-        //if user password does not matches or there is no record with that email then return @false
-        return null;
+        return array_list;
     }
-
-    public boolean isEmailExists(String email) {
-        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.query(CONTACTS_TABLE_NAME,// Selecting Table
-                new String[]{CONTACTS_COLUMN_NOHP, CONTACTS_COLUMN_EMAIL, CONTACTS_COLUMN_PASSWORD},//Selecting columns want to query
-                CONTACTS_COLUMN_EMAIL + "=?",
-                new String[]{email},//Where clause
-                null, null, null);
-
-        if (cursor != null && cursor.moveToFirst()&& cursor.getCount()>0) {
-            //if cursor has value then in user database there is user associated with this given email so return true
-            return true;
-        }
-
-        //if email does not exist return false
-        return false;
-    }
-
-
-//    public boolean insertContact (String nama, String email, String nohp, String password) {
-//        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put("name", nama);
-//        contentValues.put("email", email);
-//        contentValues.put("phone", nohp);
-//        contentValues.put("password", password);
-//        sqLiteDatabase.insert("DATA", null, contentValues);
-//        return true;
-//    }
-//
-//    public Cursor getData(String email) {
-//        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-//        Cursor res =  sqLiteDatabase.rawQuery( "select * from contacts where email = "+email+"", null );
-//        return res;
-//    }
-//
-//    public int numberOfRows(){
-//        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-//        int numRows = (int) DatabaseUtils.queryNumEntries(sqLiteDatabase, CONTACTS_TABLE_NAME);
-//        return numRows;
-//    }
-//
-//    public boolean updateContact (String nama, String email, String nohp) {
-//        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put("name", nama);
-//        contentValues.put("email", email);
-//        contentValues.put("phone", nohp);
-//        sqLiteDatabase.update("contacts", contentValues, "email = ? ", new String[] { email } );
-//        return true;
-//    }
-//
-//    public Integer deleteContact (String email) {
-//        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-//        return sqLiteDatabase.delete("contacts",
-//                "email = ? ",
-//                new String[] { email });
-//    }
-//
-//    public ArrayList<String> getAllContacts() {
-//        ArrayList<String> array_list = new ArrayList<String>();
-//
-//        //hp = new HashMap();
-//        SQLiteDatabase sqLiteDatabase = this.getReadableDatabase();
-//        Cursor res =  sqLiteDatabase.rawQuery( "select * from contacts", null );
-//        res.moveToFirst();
-//
-//        while(res.isAfterLast() == false){
-//            array_list.add(res.getString(res.getColumnIndex(CONTACTS_COLUMN_NOHP)));
-//            res.moveToNext();
-//        }
-//        return array_list;
-//    }
 }
